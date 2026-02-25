@@ -1,0 +1,19 @@
+{
+  "name": "dagga-bay",
+  "version": "1.0.0",
+  "description": "Dagga Bay — Cannabis Dispensary Ordering (Cape Town, SA)",
+  "private": true,
+  "scripts": {
+    "dev": "shadow-cljs watch app",
+    "compile": "shadow-cljs compile app",
+    "release": "shadow-cljs release app",
+    "server": "clojure -M:dev"
+  },
+  "devDependencies": {
+    "shadow-cljs": "2.28.21"
+  },
+  "dependencies": {
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  }
+}

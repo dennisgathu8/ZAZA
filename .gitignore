@@ -1,0 +1,24 @@
+# Build artifacts
+.cpcache/
+.shadow-cljs/
+node_modules/
+resources/public/js/compiled/
+target/
+
+# OS/IDE files
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Project specific
+dagga-server.log
+.tmp/
+.gemini/
+
+# Secrets (Prevention)
+.env
+*.pem
+*.key
+secrets.edn
