@@ -1,0 +1,16 @@
+.git/
+.cpcache/
+.shadow-cljs/
+node_modules/
+target/
+ resources/public/js/compiled/
+ dagga-server.log
+ .tmp/
+ .gemini/
+ .idea/
+ .vscode/
+ *.swp
+ *.swo
+ README.md
+ Dockerfile
+ fly.toml

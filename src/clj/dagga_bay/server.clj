@@ -123,11 +123,12 @@
 
 (defn start-server!
   "Start the HTTP server."
-  [& {:keys [port] :or {port 3000}}]
+  [& {:keys [port host] :or {port (parse-long (or (System/getenv "PORT") "3001"))
+                             host (or (System/getenv "HOST") "127.0.0.1")}}]
   (println "\n🔒 Security Directive: ACTIVE — defense-in-depth, OWASP Top 10, CSRF, rate limiting")
-  (println (str "🌿 Dagga Bay server starting on http://127.0.0.1:" port))
+  (println (str "🌿 Dagga Bay server starting on http://" host ":" port))
   (start-cleanup-scheduler!)
-  (reset! server (jetty/run-jetty app {:port port :host "127.0.0.1" :join? false}))
+  (reset! server (jetty/run-jetty app {:port port :host host :join? false}))
   (println (str "✅ Server running on port " port ". Press Ctrl+C to stop.\n")))
 
 (defn stop-server!
@@ -141,4 +142,4 @@
 (defn -main
   "Entry point."
   [& _args]
-  (start-server! :port 3001))
+  (start-server!))

@@ -60,7 +60,9 @@ clojure -M:prod
 ```
 
 ## DEPLOYMENT
-Source Repository: [dennisgathu8/ZAZA](https://github.com/dennisgathu8/ZAZA)
+- **GitHub Repository**: [dennisgathu8/ZAZA](https://github.com/dennisgathu8/ZAZA)
+- **Live Production URL**: [https://dagga-bay-dispensary.fly.dev](https://dagga-bay-dispensary.fly.dev)
+- **Primary Region**: `jnb` (Johannesburg, South Africa)
 
 ## LEGAL & RESPONSIBLE USE
 This software is intended for use within South African legal boundaries regarding personal cannabis use. All users must be 18+. Dagga Bay is a simulation of a delivery-orchestration platform and does not facilitate peer-to-peer payments on-site. Consume responsibly. Do not operate machinery under the influence.
