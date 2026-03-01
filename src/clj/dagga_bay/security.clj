@@ -1,7 +1,64 @@
 (ns dagga-bay.security
-  "Security utilities — CSRF tokens, input sanitization, rate limiting."
+  "Security utilities — CSRF tokens, input sanitization, rate limiting, age verification."
   (:require [crypto.random :as random]
-            [clojure.string :as str]))
+            [clojure.string :as str])
+  (:import [javax.crypto Mac]
+           [javax.crypto.spec SecretKeySpec]))
+
+;; ──────────────────────────────────────────────
+;; HMAC Cookie Signing (age gate enforcement)
+;; ──────────────────────────────────────────────
+
+(defonce ^:private cookie-secret
+  (SecretKeySpec. (.getBytes ^String (random/url-part 32) "UTF-8") "HmacSHA256"))
+
+(defn hmac-sign
+  "Sign a value with HMAC-SHA256. Returns 'value.signature'."
+  [value]
+  (let [mac (doto (Mac/getInstance "HmacSHA256")
+              (.init cookie-secret))
+        sig (->> (.doFinal mac (.getBytes (str value) "UTF-8"))
+                 (map #(format "%02x" (bit-and % 0xff)))
+                 (apply str))]
+    (str value "." sig)))
+
+(defn hmac-verify
+  "Verify an HMAC-signed cookie value. Returns the original value if valid, nil otherwise."
+  [signed-value]
+  (when (and signed-value (string? signed-value))
+    (let [dot-idx (.lastIndexOf ^String signed-value (int \.))]
+      (when (pos? dot-idx)
+        (let [value (subs signed-value 0 dot-idx)]
+          (when (= signed-value (hmac-sign value))
+            value))))))
+
+;; ──────────────────────────────────────────────
+;; Server-Side Age Verification
+;; ──────────────────────────────────────────────
+
+(defn verify-age
+  "Validate a date-of-birth string (YYYY-MM-DD) and return true if 18+."
+  [dob-str]
+  (when (and (string? dob-str)
+             (re-matches #"\d{4}-\d{2}-\d{2}" dob-str))
+    (try
+      (let [[year month day] (map parse-long (str/split dob-str #"-"))
+            now (java.time.LocalDate/now)
+            dob (java.time.LocalDate/of (int year) (int month) (int day))
+            age (.getYears (java.time.Period/between dob now))]
+        (when (and (>= age 18) (<= age 120))
+          true))
+      (catch Exception _ nil))))
+
+(defn age-verified-cookie
+  "Generate a signed, tamper-proof age-verified cookie value."
+  []
+  (hmac-sign "verified"))
+
+(defn valid-age-cookie?
+  "Check if a cookie value is a validly signed age-verified token."
+  [cookie-value]
+  (= "verified" (hmac-verify cookie-value)))
 
 ;; ──────────────────────────────────────────────
 ;; CSRF Token Management
@@ -42,7 +99,7 @@
   (when (string? s)
     (-> s
         str/trim
-        (str/replace #"[<>\"';&|`$\\]" "")  ;; Strip injection chars
+        (str/replace #"[<>\"';\\&|`$\\\\]" "")  ;; Strip injection chars
         (subs 0 (min (count s) max-len)))))
 
 (defn valid-phone?
@@ -74,9 +131,9 @@
 (defonce ^:private rate-limits (atom {}))
 
 (def ^:private rate-config
-  {:max-tokens 100      ;; increased from 10
+  {:max-tokens 100
    :refill-ms  60000    ;; refill window: 1 minute
-   :refill-amt 50})     ;; increased from 5
+   :refill-amt 50})
 
 (defn allowed?
   "Check if the given IP is within rate limits. Returns true if allowed."

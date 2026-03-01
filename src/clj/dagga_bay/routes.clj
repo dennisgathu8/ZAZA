@@ -16,6 +16,28 @@
    :headers {"Content-Type" "application/json"}
    :body (json/write-str {:csrf-token (sec/generate-csrf-token)})})
 
+(defn verify-age-handler
+  "Server-side age verification. Sets a signed HttpOnly cookie on success."
+  [request]
+  (let [body (try
+               (json/read-str (slurp (:body request)) :key-fn keyword)
+               (catch Exception _ nil))
+        dob (:dob body)]
+    (if (sec/verify-age dob)
+      ;; Age verified — set signed cookie
+      (-> (resp/response (json/write-str {:verified true}))
+          (resp/content-type "application/json")
+          (assoc-in [:headers "Set-Cookie"]
+                    (str "dagga-bay-verified=" (sec/age-verified-cookie)
+                         "; Path=/; HttpOnly; SameSite=Lax"
+                         (when (= "production" (System/getenv "DAGGA_BAY_MODE"))
+                           "; Secure"))))
+      ;; Rejected
+      {:status 403
+       :headers {"Content-Type" "application/json"}
+       :body (json/write-str {:verified false
+                              :error "You must be 18 or older to access this site."})})))
+
 (defn submit-order-handler
   "Handle order submission with CSRF validation (Rate limiting is global middleware)."
   [request]
@@ -46,5 +68,6 @@
 
 (def api-routes
   ["/api"
-   ["/csrf-token" {:get csrf-token-handler}]
-   ["/orders"     {:post submit-order-handler}]])
+   ["/csrf-token"  {:get csrf-token-handler}]
+   ["/verify-age"  {:post verify-age-handler}]
+   ["/orders"      {:post submit-order-handler}]])
