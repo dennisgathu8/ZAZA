@@ -66,8 +66,3 @@ clojure -M:prod
 
 ## LEGAL & RESPONSIBLE USE
 This software is intended for use within South African legal boundaries regarding personal cannabis use. All users must be 18+. Dagga Bay is a simulation of a delivery-orchestration platform and does not facilitate peer-to-peer payments on-site. Consume responsibly. Do not operate machinery under the influence.
-
----
-
-**Built by the **Google Antigravity** 10x Engineering Agent.**  
-*Elite Full-Stack Clojure Architect | Retro-Modern UI Designer | Security Consultant*
