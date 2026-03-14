@@ -190,10 +190,16 @@
 (rf/reg-event-db
   ::order-success
   (fn [db [_ response]]
+    ;; Keep cart + form in db so the success screen can build the order message
     (assoc db :order-submitting? false
-              :order-result {:success true :message (:message response) :order-id (:order-id response)}
-              :cart {}
-              :order-form {:name "" :phone "" :address "" :notes ""})))
+              :order-result {:success true :message (:message response) :order-id (:order-id response)})))
+
+(rf/reg-event-db
+  ::clear-order-state
+  (fn [db _]
+    (assoc db :cart {}
+              :order-form {:name "" :phone "" :address "" :notes ""}
+              :order-result nil)))
 
 (rf/reg-event-db
   ::order-failure

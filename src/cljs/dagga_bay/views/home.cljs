@@ -84,5 +84,5 @@
         [:p "Complete the secure order form with your delivery details."]]
        [:div.step
         [:span.step-num "04"]
-        [:h3 "WE CONTACT YOU"]
-        [:p "We'll reach out via WhatsApp to confirm and arrange delivery."]]]]]))
+        [:h3 "CONFIRM & DELIVER"]
+        [:p "Send your order summary via Matrix or WhatsApp — we'll confirm and arrange delivery."]]]]]))

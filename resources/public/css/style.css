@@ -1169,6 +1169,64 @@ a:hover { color: var(--green-forest); }
   margin-bottom: 12px;
 }
 
+.order-summary-msg {
+  background: var(--bg-card);
+  border: 1px solid var(--border-green);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  margin: 20px auto;
+  max-width: 500px;
+  text-align: left;
+}
+.order-summary-msg h3 {
+  font-family: var(--font-retro);
+  font-size: 20px;
+  color: var(--green-neon);
+  margin-bottom: 12px;
+}
+.order-msg-text {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-primary);
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.6;
+  margin-bottom: 12px;
+  overflow-x: auto;
+}
+.order-msg-hint {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.order-send-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 20px 0;
+}
+.order-send-actions .matrix-btn,
+.order-send-actions .whatsapp-btn {
+  padding: 14px 28px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.order-done-btn {
+  margin-top: 16px;
+  opacity: 0.8;
+  font-size: 14px !important;
+}
+.order-done-btn:hover {
+  opacity: 1;
+}
+
 .order-empty {
   text-align: center;
   padding: 60px 20px;

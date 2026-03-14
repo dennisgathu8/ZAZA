@@ -56,13 +56,7 @@
       [:a.matrix-btn
        {:href "https://matrix.to/#/@raekwonzila:matrix.org" :target "_blank" :rel "noopener noreferrer"}
        "👾 Chat via Matrix/FluffyChat"]
-      [:p "Privacy-focused, decentralized end-to-end encrypted chat."]]
-     [:div.contact-card
-      [:h3 "Email"]
-      [:p [:a {:href "mailto:orders@daggabay.co.za"} "orders@daggabay.co.za"]]]
-     [:div.contact-card
-      [:h3 "Instagram"]
-      [:p [:a {:href "#" :target "_blank" :rel "noopener noreferrer"} "@daggabay_ct"]]]]]
+      [:p "Privacy-focused, decentralized end-to-end encrypted chat."]]]]
 
    ;; Legal
    [:section.about-section.legal-section
