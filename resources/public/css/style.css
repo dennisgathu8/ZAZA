@@ -27,6 +27,10 @@
   --orange-hover: #ff8c5a;
   --orange-glow: rgba(255, 107, 53, 0.2);
 
+  --matrix-neon: #d300c5;
+  --matrix-hover: #ff00ee;
+  --matrix-glow: rgba(211, 0, 197, 0.2);
+
   --red-danger: #ff4757;
   --red-glow: rgba(255, 71, 87, 0.2);
 
@@ -520,6 +524,68 @@ a:hover { color: var(--green-forest); }
 .btn-add-cart:hover {
   background: var(--orange-hover);
   box-shadow: 0 0 15px var(--orange-glow);
+  transform: translateY(-1px);
+}
+
+.whatsapp-link {
+  color: var(--green-neon);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: bold;
+}
+.whatsapp-link:hover {
+  color: #25D366;
+  text-shadow: 0 0 10px rgba(37, 211, 102, 0.3);
+}
+
+.matrix-link {
+  color: var(--matrix-neon);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: bold;
+}
+.matrix-link:hover {
+  color: var(--matrix-hover);
+  text-shadow: 0 0 10px var(--matrix-glow);
+}
+
+.whatsapp-btn {
+  display: inline-block;
+  background: transparent;
+  color: var(--green-neon);
+  border: 1px solid var(--green-neon);
+  padding: 12px 24px;
+  font-family: var(--font-mono);
+  font-size: 15px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 12px;
+}
+.whatsapp-btn:hover {
+  color: #25D366;
+  border-color: #25D366;
+  box-shadow: 0 0 15px rgba(37, 211, 102, 0.2);
+  transform: translateY(-1px);
+}
+
+.matrix-btn {
+  display: inline-block;
+  background: transparent;
+  color: var(--matrix-neon);
+  border: 1px solid var(--matrix-neon);
+  padding: 12px 24px;
+  font-family: var(--font-mono);
+  font-size: 15px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 12px;
+}
+.matrix-btn:hover {
+  color: var(--matrix-hover);
+  border-color: var(--matrix-hover);
+  box-shadow: 0 0 15px var(--matrix-glow);
   transform: translateY(-1px);
 }
 

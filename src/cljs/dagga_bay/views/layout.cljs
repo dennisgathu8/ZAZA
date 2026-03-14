@@ -62,7 +62,9 @@
       [:h4.footer-heading "CONTACT"]
       [:p "📍 Cape Town, South Africa"]
       [:p [:a.whatsapp-link {:href "https://wa.me/254780693707" :target "_blank" :rel "noopener noreferrer"}
-           "💬 WhatsApp Us"]]]]
+           "💬 WhatsApp Us"]]
+      [:p [:a.matrix-link {:href "https://matrix.to/#/@raekwonzila:matrix.org" :target "_blank" :rel "noopener noreferrer"}
+           "👾 Secure Chat (Matrix)"]]]]
 
     [:div.footer-legal
      [:p "⚠️ " [:strong "Legal Disclaimer:"]

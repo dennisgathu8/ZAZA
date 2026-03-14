@@ -1,7 +1,5 @@
 (ns dagga-bay.views.about
-  "About, Contact, Locations, and Legal page."
-  (:require [re-frame.core :as rf]
-            [dagga-bay.events :as events]))
+  "About, Contact, Locations, and Legal page.")
 
 (defn about-page []
   [:div.page-about
@@ -53,6 +51,12 @@
        {:href "https://wa.me/254780693707" :target "_blank" :rel "noopener noreferrer"}
        "💬 Chat on WhatsApp"]
       [:p "We typically respond within 15 minutes during business hours."]]
+     [:div.contact-card
+      [:h3 "Matrix (Private / Encrypted)"]
+      [:a.matrix-btn
+       {:href "https://matrix.to/#/@raekwonzila:matrix.org" :target "_blank" :rel "noopener noreferrer"}
+       "👾 Chat via Matrix/FluffyChat"]
+      [:p "Privacy-focused, decentralized end-to-end encrypted chat."]]
      [:div.contact-card
       [:h3 "Email"]
       [:p [:a {:href "mailto:orders@daggabay.co.za"} "orders@daggabay.co.za"]]]
