@@ -10,7 +10,7 @@
 ;; ──────────────────────────────────────────────
 
 (defn- build-order-message
-  "Build a plain-text order summary for sending via Matrix or WhatsApp."
+  "Build a plain-text order summary for sending via Matrix."
   [{:keys [order-id cart-items cart-total form]}]
   (let [{:keys [name phone address notes]} form
         items-text (str/join "\n"
@@ -33,11 +33,8 @@
            (str "\nNotes: " notes))
          "\n\n✅ Please confirm this order. Thank you!")))
 
-(defn- whatsapp-url [message]
-  (str "https://wa.me/254780693707?text=" (js/encodeURIComponent message)))
-
 (defn- matrix-url []
-  "https://matrix.to/#/@raekwonzila:matrix.org")
+  "https://matrix.to/#/@markandmark1:matrix.org")
 
 ;; ──────────────────────────────────────────────
 ;; Success Screen
@@ -53,19 +50,15 @@
      [:div.success-icon "✅"]
      [:h2 "Order Submitted!"]
      [:p.order-id (str "Reference: " (:order-id result))]
-     ;; Order summary block (copyable)
      [:div.order-summary-msg
       [:h3 "📋 Your Order Summary"]
       [:pre.order-msg-text order-msg]
-      [:p.order-msg-hint "Copy the summary above and send it via your preferred channel:"]]
-     ;; Action buttons
+      [:p.order-msg-hint "Copy the summary above and send it via Matrix:"]]
+     ;; Action button
      [:div.order-send-actions
       [:a.matrix-btn
        {:href (matrix-url) :target "_blank" :rel "noopener noreferrer"}
-       "👾 Send via Matrix"]
-      [:a.whatsapp-btn
-       {:href (whatsapp-url order-msg) :target "_blank" :rel "noopener noreferrer"}
-       "💬 Send via WhatsApp"]]
+       "👾 Send via Matrix"]]
      [:button.btn-primary.order-done-btn
       {:on-click #(do (rf/dispatch [::events/clear-order-state])
                       (rf/dispatch [::events/navigate :home]))}
@@ -158,7 +151,7 @@
 
     [:p.form-disclaimer
      "By submitting, you confirm you are 18+ and that this order is for personal use only. "
-     "After submission, you'll be prompted to send your order details via Matrix or WhatsApp."]]])
+     "After submission, you'll be prompted to send your order details via Matrix."]]])
 
 ;; ──────────────────────────────────────────────
 ;; Order Page (main component)

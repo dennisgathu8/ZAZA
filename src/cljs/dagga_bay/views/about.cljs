@@ -43,20 +43,15 @@
 
    ;; Contact
    [:section.about-section
-    [:h2.section-heading "📞 CONTACT US"]
+    [:h2.section-heading "// CONTACT US"]
     [:div.contact-info
-     [:div.contact-card
-      [:h3 "WhatsApp (Fastest)"]
-      [:a.whatsapp-btn
-       {:href "https://wa.me/254780693707" :target "_blank" :rel "noopener noreferrer"}
-       "💬 Chat on WhatsApp"]
-      [:p "We typically respond within 15 minutes during business hours."]]
      [:div.contact-card
       [:h3 "Matrix (Private / Encrypted)"]
       [:a.matrix-btn
-       {:href "https://matrix.to/#/@raekwonzila:matrix.org" :target "_blank" :rel "noopener noreferrer"}
-       "👾 Chat via Matrix/FluffyChat"]
-      [:p "Privacy-focused, decentralized end-to-end encrypted chat."]]]]
+       {:href "https://matrix.to/#/@markandmark1:matrix.org" :target "_blank" :rel "noopener noreferrer"}
+       "👾 Chat via Matrix"]
+      [:p "Fully encrypted, decentralized. Supported by FluffyChat, Element, SchildiChat and more."]
+      [:p.matrix-handle "@markandmark1:matrix.org"]]]]
 
    ;; Legal
    [:section.about-section.legal-section

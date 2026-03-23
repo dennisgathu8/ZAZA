@@ -85,4 +85,4 @@
        [:div.step
         [:span.step-num "04"]
         [:h3 "CONFIRM & DELIVER"]
-        [:p "Send your order summary via Matrix or WhatsApp — we'll confirm and arrange delivery."]]]]]))
+        [:p "Send your order summary via Matrix — we'll confirm and arrange delivery."]]]]]))

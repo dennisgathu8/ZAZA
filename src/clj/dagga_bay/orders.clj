@@ -74,7 +74,7 @@
         (println (str "  Status: PENDING"))
         (println (str "══════════════════════════════════════════\n"))
         [true {:order-id order-id
-               :message "Order submitted! Please send your order details via Matrix or WhatsApp below."}])
+               :message "Order submitted! Please send your order details via Matrix below."}])
       [false result])))
 
 (defn cleanup-expired-orders!
