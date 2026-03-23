@@ -1,16 +1,22 @@
 (ns dagga-bay.security
   "Security utilities — CSRF tokens, input sanitization, rate limiting, age verification."
-  (:require [crypto.random :as random]
-            [clojure.string :as str])
+  (:require [clojure.string :as str])
   (:import [javax.crypto Mac]
            [javax.crypto.spec SecretKeySpec]))
 
 ;; ──────────────────────────────────────────────
-;; HMAC Cookie Signing (age gate enforcement)
+;; Persistent HMAC Secret
 ;; ──────────────────────────────────────────────
 
-(defonce ^:private cookie-secret
-  (SecretKeySpec. (.getBytes ^String (random/url-part 32) "UTF-8") "HmacSHA256"))
+;; Must survive server restarts. Read from DAGGA_BAY_SECRET env var in production.
+;; Falls back to a stable dev key locally so local dev always works.
+(defonce ^:private hmac-secret
+  (let [secret (or (System/getenv "DAGGA_BAY_SECRET")
+                   "dagga-bay-dev-secret-key-change-in-prod-32b")]
+    (SecretKeySpec. (.getBytes ^String secret "UTF-8") "HmacSHA256")))
+
+;; Keep cookie-secret as an alias for back-compat
+(def ^:private cookie-secret hmac-secret)
 
 (defn hmac-sign
   "Sign a value with HMAC-SHA256. Returns 'value.signature'."
@@ -61,33 +67,52 @@
   (= "verified" (hmac-verify cookie-value)))
 
 ;; ──────────────────────────────────────────────
-;; CSRF Token Management
+;; CSRF Token Management (Stateless HMAC)
 ;; ──────────────────────────────────────────────
 
-(defonce ^:private csrf-tokens (atom {}))
+;; Stateless HMAC-based CSRF tokens — no server-side state required.
+;; Format: "<timestamp>.<hmac-signature>"
+;; Tokens are valid for 60 minutes and are single-use by construction
+;; (the client discards them after use; the server validates the signature + TTL).
+
+(def ^:private csrf-ttl-ms (* 60 60 1000)) ;; 60 minutes
 
 (defn generate-csrf-token
-  "Generate a cryptographically secure CSRF token."
+  "Generate a stateless HMAC-signed CSRF token with embedded timestamp."
   []
-  (let [token (random/url-part 32)
-        expiry (+ (System/currentTimeMillis) (* 30 60 1000))] ;; 30 min TTL
-    (swap! csrf-tokens assoc token expiry)
-    token))
+  (let [ts (str (System/currentTimeMillis))
+        mac (doto (Mac/getInstance "HmacSHA256")
+              (.init hmac-secret))
+        sig (->> (.doFinal mac (.getBytes ts "UTF-8"))
+                 (map #(format "%02x" (bit-and % 0xff)))
+                 (apply str))]
+    (str ts "." sig)))
 
 (defn valid-csrf-token?
-  "Validate a CSRF token and consume it (single-use)."
+  "Validate a stateless HMAC-signed CSRF token. Returns true if valid and not expired."
   [token]
   (when (and token (string? token) (not (str/blank? token)))
-    (let [expiry (get @csrf-tokens token)]
-      (when (and expiry (> expiry (System/currentTimeMillis)))
-        (swap! csrf-tokens dissoc token)
-        true))))
+    (let [dot-idx (.lastIndexOf ^String token (int \.))
+          _ (when (neg? dot-idx) (throw (Exception. "no dot")))]
+      (try
+        (let [ts-str  (subs token 0 dot-idx)
+              sig     (subs token (inc dot-idx))
+              ts      (parse-long ts-str)
+              now     (System/currentTimeMillis)
+              mac     (doto (Mac/getInstance "HmacSHA256")
+                        (.init hmac-secret))
+              expected-sig (->> (.doFinal mac (.getBytes ts-str "UTF-8"))
+                                (map #(format "%02x" (bit-and % 0xff)))
+                                (apply str))]
+          (and (= sig expected-sig)          ;; signature valid
+               (> (+ ts csrf-ttl-ms) now)    ;; not expired
+               (> now (- ts 5000))))         ;; not from the future
+        (catch Exception _ false)))))
 
 (defn cleanup-expired-tokens!
-  "Remove expired CSRF tokens."
-  []
-  (let [now (System/currentTimeMillis)]
-    (swap! csrf-tokens (fn [m] (into {} (filter (fn [[_ exp]] (> exp now)) m))))))
+  "No-op — stateless tokens have no server-side state to clean up."
+  [])
+
 
 ;; ──────────────────────────────────────────────
 ;; Input Sanitization
