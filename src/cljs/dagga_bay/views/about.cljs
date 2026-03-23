@@ -48,7 +48,7 @@
      [:div.contact-card
       [:h3 "Matrix (Private / Encrypted)"]
       [:a.matrix-btn
-       {:href "https://matrix.to/#/@markandmark1:matrix.org" :target "_blank" :rel "noopener noreferrer"}
+       {:href "matrix:u/markandmark1:matrix.org"}
        "👾 Chat via Matrix"]
       [:p "Fully encrypted, decentralized. Supported by FluffyChat, Element, SchildiChat and more."]
       [:p.matrix-handle "@markandmark1:matrix.org"]]]]

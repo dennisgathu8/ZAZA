@@ -34,6 +34,8 @@
          "\n\n✅ Please confirm this order. Thank you!")))
 
 (defn- matrix-url []
+  ;; matrix: URI opens Matrix clients directly (Element, FluffyChat, etc.)
+  ;; Falls back to matrix.to in web browsers that don't have a Matrix client
   "https://matrix.to/#/@markandmark1:matrix.org")
 
 ;; ──────────────────────────────────────────────
@@ -57,7 +59,7 @@
      ;; Action button
      [:div.order-send-actions
       [:a.matrix-btn
-       {:href (matrix-url) :target "_blank" :rel "noopener noreferrer"}
+       {:href (matrix-url)}
        "👾 Send via Matrix"]]
      [:button.btn-primary.order-done-btn
       {:on-click #(do (rf/dispatch [::events/clear-order-state])
@@ -141,11 +143,7 @@
        :on-change #(rf/dispatch [::events/update-order-field :notes (.. % -target -value)])}]]
 
     [:button.btn-submit
-     {:on-click #(do
-                   (rf/dispatch [::events/fetch-csrf-token])
-                   (js/setTimeout
-                     (fn [] (rf/dispatch [::events/submit-order]))
-                     500))
+     {:on-click #(rf/dispatch [::events/fetch-csrf-token-then-submit])
       :disabled submitting?}
      (if submitting? "SUBMITTING..." "🔒 SUBMIT ORDER")]
 

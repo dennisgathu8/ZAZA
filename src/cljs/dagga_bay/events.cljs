@@ -133,18 +133,24 @@
 ;; ── CSRF Token Fetch ──
 
 (rf/reg-event-fx
-  ::fetch-csrf-token
+  ::fetch-csrf-token-then-submit
+  "Fetch a CSRF token, then immediately submit the order once the token arrives."
   (fn [{:keys [db]} _]
-    {:http-xhrio {:method          :get
+    {:db (assoc db :pending-order-submit? true)
+     :http-xhrio {:method          :get
                   :uri             "/api/csrf-token"
                   :response-format (ajax/json-response-format {:keywords? true})
-                  :on-success      [::csrf-token-success]
+                  :on-success      [::csrf-token-received]
                   :on-failure      [::csrf-token-failure]}}))
 
-(rf/reg-event-db
-  ::csrf-token-success
-  (fn [db [_ response]]
-    (assoc db :csrf-token (:csrf-token response))))
+(rf/reg-event-fx
+  ::csrf-token-received
+  (fn [{:keys [db]} [_ response]]
+    (let [db' (assoc db :csrf-token (:csrf-token response)
+                        :pending-order-submit? false)]
+      (if (:pending-order-submit? db)
+        {:db db' :dispatch [::submit-order]}
+        {:db db'}))))
 
 (rf/reg-event-db
   ::csrf-token-failure
