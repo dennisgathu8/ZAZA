@@ -14,11 +14,9 @@
 (rf/reg-sub ::search-query     (fn [db _] (:search-query db)))
 (rf/reg-sub ::filters          (fn [db _] (:filters db)))
 (rf/reg-sub ::cart              (fn [db _] (:cart db)))
-(rf/reg-sub ::cart-open?        (fn [db _] (:cart-open? db)))
 (rf/reg-sub ::order-form       (fn [db _] (:order-form db)))
 (rf/reg-sub ::order-submitting? (fn [db _] (:order-submitting? db)))
 (rf/reg-sub ::order-result     (fn [db _] (:order-result db)))
-(rf/reg-sub ::csrf-token       (fn [db _] (:csrf-token db)))
 (rf/reg-sub ::show-mobile-menu? (fn [db _] (:show-mobile-menu? db)))
 
 ;; ── Derived: filtered products ──────────────

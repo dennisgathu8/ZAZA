@@ -48,10 +48,10 @@
      [:div.contact-card
       [:h3 "Matrix (Private / Encrypted)"]
       [:a.matrix-btn
-       {:href "matrix:u/markandmark1:matrix.org"}
+       {:href "matrix:u/greenstate420:matrix.org"}
        "👾 Chat via Matrix"]
       [:p "Fully encrypted, decentralized. Supported by FluffyChat, Element, SchildiChat and more."]
-      [:p.matrix-handle "@markandmark1:matrix.org"]]]]
+      [:p.matrix-handle "@greenstate420:matrix.org"]]]]
 
    ;; Legal
    [:section.about-section.legal-section

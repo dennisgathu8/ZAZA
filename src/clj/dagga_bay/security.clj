@@ -11,9 +11,12 @@
 ;; Must survive server restarts. Read from DAGGA_BAY_SECRET env var in production.
 ;; Falls back to a stable dev key locally so local dev always works.
 (defonce ^:private hmac-secret
-  (let [secret (or (System/getenv "DAGGA_BAY_SECRET")
-                   "dagga-bay-dev-secret-key-change-in-prod-32b")]
-    (SecretKeySpec. (.getBytes ^String secret "UTF-8") "HmacSHA256")))
+  (delay
+    (let [secret (System/getenv "DAGGA_BAY_SECRET")]
+      (when (nil? secret)
+        (throw (ex-info "DAGGA_BAY_SECRET environment variable is not set"
+                        {:cause :missing-secret})))
+      (SecretKeySpec. (.getBytes ^String secret "UTF-8") "HmacSHA256"))))
 
 ;; Keep cookie-secret as an alias for back-compat
 (def ^:private cookie-secret hmac-secret)
@@ -22,7 +25,7 @@
   "Sign a value with HMAC-SHA256. Returns 'value.signature'."
   [value]
   (let [mac (doto (Mac/getInstance "HmacSHA256")
-              (.init cookie-secret))
+              (.init @cookie-secret))
         sig (->> (.doFinal mac (.getBytes (str value) "UTF-8"))
                  (map #(format "%02x" (bit-and % 0xff)))
                  (apply str))]
@@ -82,7 +85,7 @@
   []
   (let [ts (str (System/currentTimeMillis))
         mac (doto (Mac/getInstance "HmacSHA256")
-              (.init hmac-secret))
+              (.init @hmac-secret))
         sig (->> (.doFinal mac (.getBytes ts "UTF-8"))
                  (map #(format "%02x" (bit-and % 0xff)))
                  (apply str))]
@@ -100,7 +103,7 @@
               ts      (parse-long ts-str)
               now     (System/currentTimeMillis)
               mac     (doto (Mac/getInstance "HmacSHA256")
-                        (.init hmac-secret))
+                        (.init @hmac-secret))
               expected-sig (->> (.doFinal mac (.getBytes ts-str "UTF-8"))
                                 (map #(format "%02x" (bit-and % 0xff)))
                                 (apply str))]
@@ -127,11 +130,7 @@
         (str/replace #"[<>\"';\\&|`$\\\\]" "")  ;; Strip injection chars
         (subs 0 (min (count s) max-len)))))
 
-(defn valid-phone?
-  "Validate South African phone format."
-  [phone]
-  (when (string? phone)
-    (re-matches #"^(\+27|0)[0-9]{9,10}$" (str/replace phone #"[\s\-]" ""))))
+
 
 (defn valid-name?
   "Validate a human name — letters, spaces, hyphens, apostrophes only."

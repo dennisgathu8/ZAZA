@@ -12,7 +12,7 @@
 (defn- build-order-message
   "Build a plain-text order summary for sending via Matrix."
   [{:keys [order-id cart-items cart-total form]}]
-  (let [{:keys [name phone address notes]} form
+  (let [{:keys [name address notes]} form
         items-text (str/join "\n"
                     (map (fn [{:keys [product weight-option quantity]}]
                            (str "• " (:name product)
@@ -27,16 +27,25 @@
          "Total: R" cart-total "\n\n"
          "📦 Delivery Details:\n"
          "Name: " name "\n"
-         "Phone: " phone "\n"
+
          "Address: " address
          (when (and notes (seq notes))
            (str "\nNotes: " notes))
          "\n\n✅ Please confirm this order. Thank you!")))
 
-(defn- matrix-url []
-  ;; matrix: URI opens Matrix clients directly (Element, FluffyChat, etc.)
-  ;; Falls back to matrix.to in web browsers that don't have a Matrix client
-  "https://matrix.to/#/@markandmark1:matrix.org")
+(defn- matrix-url
+  "Build a matrix.to deep link with optional pre-filled message body."
+  ([] (matrix-url nil))
+  ([body]
+   (str "https://matrix.to/#/@greenstate420:matrix.org"
+        (when body
+          (str "?body="
+               (-> (js/encodeURIComponent body)
+                   (str/replace #"!" "%21")
+                   (str/replace #"'" "%27")
+                   (str/replace #"\(" "%28")
+                   (str/replace #"\)" "%29")
+                   (str/replace #"\*" "%2A")))))))
 
 ;; ──────────────────────────────────────────────
 ;; Success Screen
@@ -59,7 +68,9 @@
      ;; Action button
      [:div.order-send-actions
       [:a.matrix-btn
-       {:href (matrix-url)}
+       {:href (matrix-url order-msg)
+        :target "_blank"
+        :rel "noopener noreferrer"}
        "👾 Send via Matrix"]]
      [:button.btn-primary.order-done-btn
       {:on-click #(do (rf/dispatch [::events/clear-order-state])
@@ -115,14 +126,6 @@
        :max-length 100
        :on-change #(rf/dispatch [::events/update-order-field :name (.. % -target -value)])}]]
 
-    [:div.form-group
-     [:label {:for "order-phone"} "Phone Number * (SA format)"]
-     [:input#order-phone.form-input
-      {:type "tel"
-       :value (:phone form)
-       :placeholder "+27 XX XXX XXXX or 0XX XXX XXXX"
-       :max-length 15
-       :on-change #(rf/dispatch [::events/update-order-field :phone (.. % -target -value)])}]]
 
     [:div.form-group
      [:label {:for "order-address"} "Delivery Address * (Cape Town area)"]

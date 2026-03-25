@@ -16,11 +16,9 @@
                     :thc-max     100
                     :price-sort  nil}  ;; :asc or :desc
    :order-form     {:name    ""
-                    :phone   ""
-                    :address ""
-                    :notes   ""}
+                     :address ""
+                     :notes   ""}
    :order-submitting? false
    :order-result      nil
    :csrf-token        nil
-   :cart-open?        false
    :show-mobile-menu? false})

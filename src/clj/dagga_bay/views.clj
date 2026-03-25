@@ -77,7 +77,6 @@
       "\"name\":\"Dagga Bay\","
       "\"description\":\"" (:description site-meta) "\","
       "\"url\":\"" (:url site-meta) "\","
-      "\"telephone\":\"" (:phone site-meta) "\","
       "\"address\":{"
       "\"@type\":\"PostalAddress\","
       "\"streetAddress\":\"" (:street address) "\","

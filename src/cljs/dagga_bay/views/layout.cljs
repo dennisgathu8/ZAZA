@@ -61,7 +61,7 @@
      [:div.footer-col
       [:h4.footer-heading "CONTACT"]
       [:p "📍 Cape Town, South Africa"]
-      [:p [:a.matrix-link {:href "matrix:u/markandmark1:matrix.org"}
+      [:p [:a.matrix-link {:href "matrix:u/greenstate420:matrix.org"}
            "👾 Secure Chat via Matrix"]]]]
 
     [:div.footer-legal

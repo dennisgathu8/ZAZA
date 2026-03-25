@@ -31,6 +31,14 @@ This project is built with a **Defense-in-Depth** architecture, prioritizing the
 - **Styling**: Pure CSS3 (Retro-Modern Hybrid)
 - **State**: In-memory Atom + Transit for secure data handling
 
+## ENVIRONMENT VARIABLES
+See [`.env.example`](.env.example) for the reference configuration.
+
+- **`DAGGA_BAY_SECRET`** (Required): HMAC secret key for cryptographic token signing. Use a long random string (minimum 32 characters). Never commit the real value.
+- **`DAGGA_BAY_MODE`** (Optional): Set to "production" to enable Secure flag on session cookies. Any value other than "production" disables the Secure flag (for local dev).
+- **`PORT`** (Optional): Port the HTTP server binds to. Defaults to 3000 if unset.
+- **`HOST`** (Optional): Host/interface the HTTP server binds to. Defaults to 0.0.0.0 if unset.
+
 ## HOW TO RUN
 
 ### Prerequisites

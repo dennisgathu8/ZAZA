@@ -29,7 +29,7 @@
           (resp/content-type "application/json")
           (assoc-in [:headers "Set-Cookie"]
                     (str "dagga-bay-verified=" (sec/age-verified-cookie)
-                         "; Path=/; HttpOnly; SameSite=Lax"
+                         "; Path=/; HttpOnly; SameSite=Strict"
                          (when (= "production" (System/getenv "DAGGA_BAY_MODE"))
                            "; Secure"))))
       ;; Rejected

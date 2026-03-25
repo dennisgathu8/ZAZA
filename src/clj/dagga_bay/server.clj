@@ -237,7 +237,7 @@
               (try
                 (sec/cleanup-expired-tokens!)
                 (sec/cleanup-rate-limits!)
-                ((resolve 'dagga-bay.orders/cleanup-expired-orders!))
+
                 (catch Exception e
                   (println "Cleanup error:" (.getMessage e))))
               (recur)))))
@@ -270,21 +270,13 @@
 
 (defn start-server!
   "Start the HTTP server."
-  [& {:keys [port host] :or {port (parse-long (or (System/getenv "PORT") "3001"))
-                             host (or (System/getenv "HOST") "127.0.0.1")}}]
+  [& {:keys [port host] :or {port (parse-long (or (System/getenv "PORT") "8080"))
+                             host (or (System/getenv "HOST") "0.0.0.0")}}]
   (println "\n🔒 Security Directive: ACTIVE — defense-in-depth, OWASP Top 10, CSRF, rate limiting")
   (println (str "🌿 Dagga Bay server starting on http://" host ":" port))
   (start-cleanup-scheduler!)
   (reset! server (jetty/run-jetty app {:port port :host host :join? false}))
   (println (str "✅ Server running on port " port ". Press Ctrl+C to stop.\n")))
-
-(defn stop-server!
-  "Stop the HTTP server."
-  []
-  (when-let [s @server]
-    (.stop s)
-    (reset! server nil)
-    (println "🛑 Server stopped.")))
 
 (defn -main
   "Entry point."

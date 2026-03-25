@@ -37,10 +37,6 @@
       (assoc db :age-verified? verified?
                 :age-error (when-not verified? "You must be 18 or older to enter.")))))
 
-(rf/reg-event-db
-  ::dismiss-age-error
-  (fn [db _]
-    (dissoc db :age-error)))
 
 ;; ──────────────────────────────────────────────
 ;; Navigation
@@ -50,8 +46,7 @@
   ::navigate
   (fn [db [_ route]]
     (assoc db :current-route route
-              :show-mobile-menu? false
-              :cart-open? false)))
+              :show-mobile-menu? false)))
 
 (rf/reg-event-db
   ::toggle-mobile-menu
@@ -112,10 +107,6 @@
   (fn [db _]
     (assoc db :cart {})))
 
-(rf/reg-event-db
-  ::toggle-cart
-  (fn [db _]
-    (update db :cart-open? not)))
 
 ;; ──────────────────────────────────────────────
 ;; Order Form
@@ -125,7 +116,7 @@
   ::update-order-field
   (fn [db [_ field value]]
     ;; Client-side length limits
-    (let [max-len (case field :name 100 :phone 15 :address 500 :notes 500 100)
+    (let [max-len (case field :name 100 :address 500 :notes 500 100)
           v (str value)
           sanitized (subs v 0 (min (count v) max-len))]
       (assoc-in db [:order-form field] sanitized))))
@@ -154,15 +145,18 @@
 
 (rf/reg-event-db
   ::csrf-token-failure
-  (fn [db _]
-    (assoc db :csrf-error "Failed to load security token. Please refresh.")))
+  (fn [db [_ error]]
+    (js/console.error "CSRF token fetch failed:" (clj->js error))
+    (assoc db :pending-order-submit? false
+              :order-submitting? false
+              :order-result {:errors ["Failed to load security token. Please refresh the page."]})))
 
 ;; ── Submit Order ──
 
 (rf/reg-event-fx
   ::submit-order
   (fn [{:keys [db]} _]
-    (let [{:keys [name phone address notes]} (:order-form db)
+    (let [{:keys [name address notes]} (:order-form db)
           items (mapv (fn [[_ {:keys [product weight-option quantity]}]]
                         {:product-id (:id product)
                          :name (:name product)
@@ -173,9 +167,7 @@
           errors (cond-> []
                    (< (count (str/trim name)) 2)
                    (conj "Name must be at least 2 characters")
-                   (not (re-matches #"^(\+27|0)[0-9]{9,10}$"
-                                    (str/replace phone #"[\s\-]" "")))
-                   (conj "Enter a valid SA phone number (+27... or 0...)")
+
                    (< (count (str/trim address)) 10)
                    (conj "Address must be at least 10 characters")
                    (empty? items)
@@ -185,7 +177,7 @@
         {:db (assoc db :order-submitting? true :order-result nil)
          :http-xhrio {:method          :post
                       :uri             "/api/orders"
-                      :params          {:name name :phone phone :address address
+                      :params          {:name name :address address
                                         :notes notes :items items}
                       :headers         {"X-CSRF-Token" (:csrf-token db)}
                       :format          (ajax/json-request-format)
@@ -204,11 +196,16 @@
   ::clear-order-state
   (fn [db _]
     (assoc db :cart {}
-              :order-form {:name "" :phone "" :address "" :notes ""}
+              :order-form {:name "" :address "" :notes ""}
               :order-result nil)))
 
 (rf/reg-event-db
   ::order-failure
-  (fn [db [_ {:keys [response]}]]
-    (assoc db :order-submitting? false
-              :order-result {:errors [(or (:error response) "Order failed. Please try again.")]})))
+  (fn [db [_ error-map]]
+    (js/console.error "Order submission failed:" (clj->js error-map))
+    (let [response (:response error-map)
+          status   (:status error-map)]
+      (assoc db :order-submitting? false
+                :order-result {:errors (or (:errors response)
+                                           (when-let [err (:error response)] [err])
+                                           [(str "Order failed (HTTP " status "). Please try again.")])}))))
